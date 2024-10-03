@@ -2,6 +2,7 @@ import os
 
 SUPPORTED_EXTENSIONS = ['.txt', '.jpg', '.png', '.pdf', '.docx']
 
+
 def folder_input():
     while True:
         folder_path = input('Enter the folder path to encrypt: ')
@@ -44,7 +45,7 @@ def encode(file, password):
         print(f"Encrypting file: {file}.")
         
         # Create the encrypted file with .enc extension
-        encrypted_file_path = f"{base_name}_encrypted{file_extension}"
+        encrypted_file_path = f"{base_name}.enc"
         
         # Creating an empty file.
         with open(encrypted_file_path, 'w') as enc_file:
@@ -59,18 +60,6 @@ def encode(file, password):
     except Exception as e:
         display_error(f"Error encrypting {file}: {e}")
         return False  # Indicate that encryption was not successful
-
-
-def create_decryption_script():
-    # Todo
-    decryption_script_content = "# Decryption logic"
-
-    # Write the decryption script to a file
-    with open('decryption_script.py', 'w') as script_file:
-        script_file.write(decryption_script_content)
-    
-    print("The decryption script has been created as 'decryption_script.py'.")
-    return
 
 
 def encrypt_folder(folder_path, password):
@@ -95,8 +84,6 @@ def encrypt_folder(folder_path, password):
                 # If there's an error during encoding, log the error and file name
                 print(f"Error encrypting {file_name}: {e}")
                 failed_files.append(file_name)
-
-    create_decryption_script()
     
     # Print results
     print(f"Encryption complete for folder: {folder_path}.", f"Encrypted {len(encrypted_files)} out of {len(encrypted_files) + len(failed_files)} files.")
@@ -107,31 +94,75 @@ def encrypt_folder(folder_path, password):
             print(f"- {failed_file}")
 
 
+def decode(file, password):
+    # Todo
+    # decrypt the file and delete the *.enc file
+    print(f"Decrypting file: {file}.")
+    
+
+def decrypt_folder(folder_path, password):
+    # Check for .enc files in the specified folder
+    enc_files = [file_name for file_name in os.listdir(folder_path) if file_name.endswith('.enc')]
+
+    if not enc_files:
+        display_error("No encrypted files (.enc) found in the specified folder.")
+        return
+    
+    for file_name in os.listdir(folder_path):
+        if file_name.endswith('.enc'):  # Assuming encrypted files have .enc extension
+            file_path = os.path.join(folder_path, file_name)
+            decode(file_path, password)
+    print("Decryption complete.")
+
+
 def display_error(message):
     print(f"Error: {message}")
 
-# Main
-
-# Example of usage:
-# Enter non-absolute path of the folder (for now)
-# folder_path = 'example'
-# password = 'pass'
-
-# To clean up use: rm example/*encrypted*
 
 def main():
-    folder_path = folder_input()
-    if folder_path:
-        password = password_input()
-        if password:
+    while True:
+        print("Choose an option:")
+        print("1. Encrypt files")
+        print("2. Decrypt files")
+        print("3. Exit")
+        choice = input("Enter your choice (1/2/3): ")
+
+        if choice == '1':
+            folder_path = input('Enter the folder path to encrypt: ')
+            password = input('Enter a password: ')
             encrypt_folder(folder_path, password)
+            print("Encryption complete.")
+        elif choice == '2':
+            folder_path = input('Enter the folder path to decrypt: ')
+            password = input('Enter the password for decryption: ')
+            decrypt_folder(folder_path, password)
+        elif choice == '3':
+            print("Exiting the application.")
+            break
+        else:
+            display_error("Invalid choice! Please try again.")
 
 if __name__ == '__main__':
     main()
 
+
+# Example of usage:
+# Choose number from the menu: 1
+# Enter non-absolute path of the folder (for now)
+# folder_path = 'example'
+# password = 'pass'
+# To clean up use: rm example/*.enc
+
+
 # To discuss:
-# - i will
 # - will we use absolute path for the folder input?
 # - will we encrypt recursively every subfolder in the chosen folder?
-# - we should edit SUPPORTED_EXTENSIONS.
+# - should we edit SUPPORTED_EXTENSIONS?
 # - how should we change the names of the files after encryption?
+
+
+# Comments:
+# - Stworzyłam menu żeby wybrać encryption albo decryption po odpaleniu apki zamiast 
+# tworzenia osobnego skryptu
+# - Coś jest nie tak z wybieraniem folderu - wieczorem poprawię,
+# wpisanie 'example' jako folder działa
