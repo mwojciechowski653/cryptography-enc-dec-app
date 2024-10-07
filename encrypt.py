@@ -128,13 +128,13 @@ def main():
         choice = input("Enter your choice (1/2/3): ")
 
         if choice == '1':
-            folder_path = input('Enter the folder path to encrypt: ')
-            password = input('Enter a password: ')
+            folder_path = folder_input()
+            password = password_input()
             encrypt_folder(folder_path, password)
             print("Encryption complete.")
         elif choice == '2':
-            folder_path = input('Enter the folder path to decrypt: ')
-            password = input('Enter the password for decryption: ')
+            folder_path = folder_input()
+            password = password_input()
             decrypt_folder(folder_path, password)
         elif choice == '3':
             print("Exiting the application.")
@@ -152,17 +152,3 @@ if __name__ == '__main__':
 # folder_path = 'example'
 # password = 'pass'
 # To clean up use: rm example/*.enc
-
-
-# To discuss:
-# - will we use absolute path for the folder input?
-# - will we encrypt recursively every subfolder in the chosen folder?
-# - should we edit SUPPORTED_EXTENSIONS?
-# - how should we change the names of the files after encryption?
-
-
-# Comments:
-# - Stworzyłam menu żeby wybrać encryption albo decryption po odpaleniu apki zamiast 
-# tworzenia osobnego skryptu
-# - Coś jest nie tak z wybieraniem folderu - wieczorem poprawię,
-# wpisanie 'example' jako folder działa
