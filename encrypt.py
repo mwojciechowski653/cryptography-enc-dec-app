@@ -1,72 +1,52 @@
 import os
-
-SUPPORTED_EXTENSIONS = ['.txt', '.jpg', '.png', '.pdf', '.docx']
-
-
-def folder_input():
-    while True:
-        folder_path = input('Enter the folder path to encrypt: ')
-        
-        # Check if the provided path is a valid directory
-        if not os.path.isdir(folder_path):
-            display_error("Invalid folder path! Please try again.")
-            continue  # Prompt user again
-        
-        # Check if the folder is empty
-        if not os.listdir(folder_path):
-            display_error("The folder is empty! Please try again.")
-            continue  # Prompt user again
-        
-        # If everything is valid, return the folder path
-        return folder_path
+from Crypto.Cipher import AES
+from Crypto.Random import get_random_bytes
+from utils.file_utils import *
+import json
 
 
-def password_input():
-    while True:
-        password = input('Enter a password: ')
-        
-        # Check if the password is empty
-        if not password:
-            display_error("Password cannot be empty! Please try again.")
-        else:
-            return password  # Return the valid password
-
-
-def encode(file, password):
+def encode(file, key):
     # Get the file extension
     base_name, file_extension = os.path.splitext(file)
-
-    # Check if the file extension is supported
-    if file_extension.lower() not in SUPPORTED_EXTENSIONS:
-        display_error(f"Unsupported file extension: {file_extension}. Skipping file.")
-        return False  # Indicate that encryption was not successful
 
     try:
         print(f"Encrypting file: {file}.")
         
         # Create the encrypted file with .enc extension
         encrypted_file_path = f"{base_name}.enc"
-        
-        # Creating an empty file.
-        with open(encrypted_file_path, 'w') as enc_file:
-            # Todo
-            # Replace with actual encrypted data
-            enc_file.write("Encrypted data.")  
-        
-        # Delete the original file (commented out for safety)
-        # os.remove(file)
-        
+
+        file_data = read_file(file) # Read the file content
+        iv = get_random_bytes(16)  # Generate a random 16-byte initialization vector
+
+        # Create an AES cipher object with the key and IV and encrypt data
+        cipher = AES.new(key, AES.MODE_CFB, iv)
+
+        data_to_encrypt = json.dumps({
+            'file_extension': file_extension,
+            'file_content': file_data.hex()
+        }).encode()
+
+        encrypted_data = iv + cipher.encrypt(data_to_encrypt)
+        write_file(encrypted_file_path, encrypted_data) #write data to file
+        os.remove(file) # Delete the original file
+
         return True  # Indicate that encryption was successful
+    
     except Exception as e:
         display_error(f"Error encrypting {file}: {e}")
         return False  # Indicate that encryption was not successful
 
 
-def encrypt_folder(folder_path, password):
+def encrypt_folder(folder_path):
     # Lists to keep track of encrypted and failed files
     encrypted_files = []
     failed_files = []
-    
+
+    #Generate and save the key
+    key_file_path = f"{folder_path}.key"
+    key = get_random_bytes(16)
+    write_file(key_file_path, key)
+
     # List all files in the folder
     for file_name in os.listdir(folder_path):
         file_path = os.path.join(folder_path, file_name)
@@ -75,7 +55,7 @@ def encrypt_folder(folder_path, password):
         if os.path.isfile(file_path):
             # Try to encrypt the file and handle exceptions
             try:
-                success = encode(file_path, password)
+                success = encode(file_path, key)
                 if success:
                     encrypted_files.append(file_name)  # Add to encrypted list
                 else:
@@ -94,13 +74,37 @@ def encrypt_folder(folder_path, password):
             print(f"- {failed_file}")
 
 
-def decode(file, password):
-    # Todo
-    # decrypt the file and delete the *.enc file
-    print(f"Decrypting file: {file}.")
+def decode(file, key):
+    try:
+        print(f"Decrypting file: {file}.")
+        
+        # Get the original file name
+        base_name, _ = os.path.splitext(file)
+
+        file_data = read_file(file) # Read the encrypted file content
+
+        # Create an AES cipher object with the key and IV and decrypt data
+        iv = file_data[:16]
+        encrypted_content = file_data[16:]
+        cipher = AES.new(key, AES.MODE_CFB, iv)
+        decrypted_data = cipher.decrypt(encrypted_content)
+
+        #parse json structure
+        decrypted_json = json.loads(decrypted_data.decode())
+        file_extension = decrypted_json['file_extension']
+        file_content = bytes.fromhex(decrypted_json['file_content'])
+        
+        # Write the decrypted data to a new file
+        decrypted_file_path = base_name + file_extension  
+        write_file(decrypted_file_path, file_content)
+        
+        # Delete the encrypted file
+        os.remove(file)
+    except Exception as e:
+        display_error(f"Error decrypting {file}: {e}")
     
 
-def decrypt_folder(folder_path, password):
+def decrypt_folder(folder_path, key_path):
     # Check for .enc files in the specified folder
     enc_files = [file_name for file_name in os.listdir(folder_path) if file_name.endswith('.enc')]
 
@@ -108,15 +112,14 @@ def decrypt_folder(folder_path, password):
         display_error("No encrypted files (.enc) found in the specified folder.")
         return
     
+    # Load the key from the key file
+    key = read_file(key_path)
+    
     for file_name in os.listdir(folder_path):
         if file_name.endswith('.enc'):  # Assuming encrypted files have .enc extension
             file_path = os.path.join(folder_path, file_name)
-            decode(file_path, password)
+            decode(file_path, key)
     print("Decryption complete.")
-
-
-def display_error(message):
-    print(f"Error: {message}")
 
 
 def main():
@@ -129,13 +132,12 @@ def main():
 
         if choice == '1':
             folder_path = folder_input()
-            password = password_input()
-            encrypt_folder(folder_path, password)
+            encrypt_folder(folder_path)
             print("Encryption complete.")
         elif choice == '2':
             folder_path = folder_input()
-            password = password_input()
-            decrypt_folder(folder_path, password)
+            key_path = key_file_input()
+            decrypt_folder(folder_path, key_path)
         elif choice == '3':
             print("Exiting the application.")
             break
@@ -147,8 +149,15 @@ if __name__ == '__main__':
 
 
 # Example of usage:
+#
+# ENCRYPTION
 # Choose number from the menu: 1
 # Enter non-absolute path of the folder (for now)
 # folder_path = 'example'
-# password = 'pass'
-# To clean up use: rm example/*.enc
+#
+# DECRYPTION
+# Choose number from the menu: 2
+# Enter  path of the folder (absolute also works)
+# folder_path = 'example'
+# Enter  path of the key file
+# key_path = 'example.key'

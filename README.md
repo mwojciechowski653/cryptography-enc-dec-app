@@ -15,10 +15,10 @@ This project is a simple Python application that allows users to encrypt and dec
 Before running this application, ensure you have the following installed:
 
 - Python 3.x
-- The required Python libraries, which can be installed via pip:
+- The required Python libraries, which can be installed via pip: (virtual environment is reccomended)
 
 ```bash
-pip install pycryptodome
+pip install -r requirements.txt
 ```
 
 ## Setup
@@ -47,12 +47,6 @@ cd ual-cryptography
     example
     ```
 
-    Enter a password for encryption. All files in the folder will be encrypted, and each file will be replaced by an encrypted version with the .enc extension.
-
-    ```bash
-    password123
-    ```
-
     You can choose to decrypt later via the main menu.
 
 - **Decrypt files**:
@@ -65,7 +59,11 @@ cd ual-cryptography
 
     Input the folder path where the encrypted files are located.
 
-    Enter the password used during encryption. All encrypted files will be decrypted, and the original filenames will be restored.
+    Enter the path to the key used during encryption. All encrypted files will be decrypted, and the original filenames will be restored.
+
+    ```bash
+    example.key
+    ```
 
 ## Example Workflow
 
@@ -78,7 +76,9 @@ Decrypt a folder: You can later use the same password to restore the original fi
 - Discuss renaming files after encryption to e.g. image_encrypted.png
 - Discuss recursively encrypting every subfolder and file in the selected folder.
 - Discuss using absolute paths for folder input to avoid potential path issues.
-- Discuss adding support for other file formats.
-- Add encrypting and decrypting logic.
+- Discuss file formats.
+- Add encrypting and decrypting logic to encrypt whole folder to one file
 - Implement better error handling and test.
 - Add GUI.
+- Discuss Password
+- improve code structure
