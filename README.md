@@ -74,6 +74,6 @@ Decrypt a folder: You can later use the same password to restore the original fi
 - Discuss using absolute paths for folder input to avoid potential path issues.
 - Discuss file formats.
 - Add encrypting and decrypting logic to encrypt whole folder to one file
-- Implement better error handling(does GUI errors counts?) and test.
+- Implement better error handling(does GUI errors counts?) and test
 - Discuss Password
 - improve code structure
