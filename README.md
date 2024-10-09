@@ -54,7 +54,7 @@ cd ual-cryptography
     Run the application and choose option 2:
 
     ```bash
-    python encrypt.py
+    python3 encrypt.py
     ```
 
     Input the folder path where the encrypted files are located.

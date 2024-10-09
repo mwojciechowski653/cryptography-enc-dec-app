@@ -3,7 +3,8 @@ from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 from utils.file_utils import *
 import json
-
+import tkinter as tk
+from tkinter import ttk, messagebox
 
 def encode(file, key):
     # Get the file extension
@@ -122,28 +123,68 @@ def decrypt_folder(folder_path, key_path):
     print("Decryption complete.")
 
 
+
 def main():
-    while True:
-        print("Choose an option:")
-        print("1. Encrypt files")
-        print("2. Decrypt files")
-        print("3. Exit")
-        choice = input("Enter your choice (1/2/3): ")
+    
+    # 
+    # TERMINAL VERSION
+    # 
+    # while True:
+    #     print("Choose an option:")
+    #     print("1. Encrypt files")
+    #     print("2. Decrypt files")
+    #     print("3. Exit")
+    #     choice = input("Enter your choice (1/2/3): ")
+    # 
+    #     if choice == '1':
+    #         folder_path = folder_input()
+    #         encrypt_folder(folder_path)
+    #         print("Encryption complete.")
+    #     elif choice == '2':
+    #         folder_path = folder_input()
+    #         key_path = key_file_input()
+    #         decrypt_folder(folder_path, key_path)
+    #     elif choice == '3':
+    #         print("Exiting the application.")
+    #         break
+    #     else:
+    #         display_error("Invalid choice! Please try again.")
+    
+    
+    #
+    # GUI VERSION
+    #
 
-        if choice == '1':
-            folder_path = folder_input()
-            encrypt_folder(folder_path)
-            print("Encryption complete.")
-        elif choice == '2':
-            folder_path = folder_input()
-            key_path = key_file_input()
-            decrypt_folder(folder_path, key_path)
-        elif choice == '3':
-            print("Exiting the application.")
-            break
+    def check_value():
+        if option.get() == "Encrypt":
+            search_folder_button.pack()
+            decide.forget()
+            options_dropdown.forget()
+        elif option.get() == "Decrypt":
+            search_folder_button.pack()
+            decide.forget()
+            options_dropdown.forget()
         else:
-            display_error("Invalid choice! Please try again.")
+            messagebox.showerror("Wrong option", "Please choose on of the available options")
+            
+    def choose_folder():
+        pass
+    
+    window = tk.Tk()
+    window.geometry("400x400")
+    window.title("Encryption and Decryption App")
+    
+    option = tk.StringVar()
+    option.set("Encrypt")
+    options_dropdown = ttk.Combobox(window, textvariable=option, values=("Encrypt", "Decrypt"))
+    options_dropdown.pack()
 
+    decide = tk.Button(window, text="Choose this option", command=check_value)
+    decide.pack()
+
+    search_folder_button = tk.Button(window, text="Choose folder", command=choose_folder)
+    tk.mainloop()
+    
 if __name__ == '__main__':
     main()
 
