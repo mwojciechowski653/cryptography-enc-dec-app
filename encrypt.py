@@ -113,12 +113,16 @@ def decode(file, key):
         display_error(f"Error decrypting {file}: {e}")
     
 
-def decrypt_folder(folder_path, key_path):
+def decrypt_folder(folder_path, key_path, option):
     # Check for .enc files in the specified folder
     enc_files = [file_name for file_name in os.listdir(folder_path) if file_name.endswith('.enc')]
 
     if not enc_files:
         display_error("No encrypted files (.enc) found in the specified folder.")
+
+        if option == "g":
+            messagebox.showerror("No encrypted files", "No encrypted files (.enc) found in the specified folder.")
+            
         return
     
     # Load the key from the key file
@@ -129,6 +133,8 @@ def decrypt_folder(folder_path, key_path):
             file_path = os.path.join(folder_path, file_name)
             decode(file_path, key)
     print("Decryption complete.")
+    if option == "g":
+        messagebox.showinfo("Decryption complete", "Decryption complete.")
 
 
 
@@ -145,13 +151,13 @@ def main():
     #     choice = input("Enter your choice (1/2/3): ")
     # 
     #     if choice == '1':
-    #         folder_path = folder_input()
+    #         folder_path = folder_input("t")
     #         encrypt_folder(folder_path,"t")
     #         print("Encryption complete.")
     #     elif choice == '2':
-    #         folder_path = folder_input()
-    #         key_path = key_file_input()
-    #         decrypt_folder(folder_path, key_path)
+    #         folder_path = folder_input("t")
+    #         key_path = key_file_input("t")
+    #         decrypt_folder(folder_path, key_path, "t")
     #     elif choice == '3':
     #         print("Exiting the application.")
     #         break
@@ -174,17 +180,50 @@ def main():
             options_dropdown.forget()
 
             search_folder_button.pack()
+            search_key_button.pack()
         else:
             messagebox.showerror("Wrong option", "Please choose on of the available options")
             
     def choose_folder():
-        folder_path = folder_input_gui()
+        folder_path = folder_input("g")
         path.set(folder_path)
         if option.get() == "Encrypt":
             encrypt_button.pack()
+        if option.get() == "Decrypt":
+            if check.get():
+                decrypt_button.pack()
+            else:
+                check.set(True)
+    def choose_key():
+        file_path = key_file_input("g")
+        key_path.set(file_path)
+        if check.get():
+            decrypt_button.pack()
+        else:
+            check.set(True)
+            
+    def post_encrypt_decrypt(op):
+        if op == "e":
+            encrypt_folder(path.get(), "g")
+            
+            encrypt_button.forget()
+        elif op == "d":
+            decrypt_folder(path.get(), key_path.get(), "g")
+            
+            search_key_button.forget()
+            decrypt_button.forget()
 
+        search_folder_button.forget()
+        
+        option.set("Encrypt")
+        options_dropdown.pack()
+        decide.pack()
+        path.set("")
+        key_path.set("")
+        check.set(False)
+        
     window = tk.Tk()
-    window.geometry("400x400")
+    window.geometry("400x100")
     window.title("Encryption and Decryption App")
     
     option = tk.StringVar()
@@ -196,13 +235,15 @@ def main():
     decide.pack()
 
     path = tk.StringVar()
+    key_path = tk.StringVar()
+    check = tk.BooleanVar()
+    check.set(False)
     search_folder_button = tk.Button(window, text="Choose folder", command=choose_folder)
+    search_key_button = tk.Button(window, text="Choose key file", command=choose_key)
 
-    encrypt_button = tk.Button(window, text="Encrypt", command=lambda: encrypt_folder(path.get(), "g"))
+    encrypt_button = tk.Button(window, text="Encrypt", command=lambda: post_encrypt_decrypt("e"))
     
-    
-    label = tk.Label(window, text=":)")
-    label.pack()
+    decrypt_button = tk.Button(window, text="Decrypt", command=lambda: post_encrypt_decrypt("d"))
     
     tk.mainloop()
     
