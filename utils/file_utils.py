@@ -1,4 +1,5 @@
 import os
+from tkinter import messagebox, filedialog
 
 def display_error(message):
     print(f"Error: {message}")
@@ -25,6 +26,26 @@ def folder_input():
             display_error("The folder is empty! Please try again.")
             continue  # Prompt user again
         
+        # If everything is valid, return the folder path
+        return folder_path
+
+
+def folder_input_gui():
+    while True:
+        folder_path = filedialog.askdirectory(title="Choose folder")
+
+        # Check if the provided path is a valid directory
+        if not os.path.isdir(folder_path):
+            display_error("Invalid folder path! Please try again.")
+            messagebox.showerror("Invalid folder path", "Invalid folder path! Please try again.")
+            return folder_path
+
+        # Check if the folder is empty
+        if not os.listdir(folder_path):
+            display_error("The folder is empty! Please try again.")
+            messagebox.showerror("The folder is empty!", "The folder is empty! Please try again.")
+            continue  # Prompt user again
+
         # If everything is valid, return the folder path
         return folder_path
 

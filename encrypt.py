@@ -38,7 +38,7 @@ def encode(file, key):
         return False  # Indicate that encryption was not successful
 
 
-def encrypt_folder(folder_path):
+def encrypt_folder(folder_path, option):
     # Lists to keep track of encrypted and failed files
     encrypted_files = []
     failed_files = []
@@ -65,14 +65,22 @@ def encrypt_folder(folder_path):
                 # If there's an error during encoding, log the error and file name
                 print(f"Error encrypting {file_name}: {e}")
                 failed_files.append(file_name)
+                if option == "g":
+                    messagebox.showerror("Error encrypting file", f"Error encrypting {file_name}: {e}")
     
     # Print results
     print(f"Encryption complete for folder: {folder_path}.", f"Encrypted {len(encrypted_files)} out of {len(encrypted_files) + len(failed_files)} files.")
-    
+    if option == "g":
+        messagebox.showinfo("Encryption completed", f"Encryption complete for folder: {folder_path}.\nEncrypted {len(encrypted_files)} out of {len(encrypted_files) + len(failed_files)} files.")
+        
     if failed_files:
         print("Failed to encrypt the following files:")
+        info = ""
         for failed_file in failed_files:
             print(f"- {failed_file}")
+            info += f"- {failed_file}\n"
+        if option == "g":
+            messagebox.showerror("Error encrypting files", f"Error encrypting {info}")
 
 
 def decode(file, key):
@@ -138,7 +146,7 @@ def main():
     # 
     #     if choice == '1':
     #         folder_path = folder_input()
-    #         encrypt_folder(folder_path)
+    #         encrypt_folder(folder_path,"t")
     #         print("Encryption complete.")
     #     elif choice == '2':
     #         folder_path = folder_input()
@@ -157,19 +165,24 @@ def main():
 
     def check_value():
         if option.get() == "Encrypt":
-            search_folder_button.pack()
             decide.forget()
             options_dropdown.forget()
+
+            search_folder_button.pack()
         elif option.get() == "Decrypt":
-            search_folder_button.pack()
             decide.forget()
             options_dropdown.forget()
+
+            search_folder_button.pack()
         else:
             messagebox.showerror("Wrong option", "Please choose on of the available options")
             
     def choose_folder():
-        pass
-    
+        folder_path = folder_input_gui()
+        path.set(folder_path)
+        if option.get() == "Encrypt":
+            encrypt_button.pack()
+
     window = tk.Tk()
     window.geometry("400x400")
     window.title("Encryption and Decryption App")
@@ -182,7 +195,15 @@ def main():
     decide = tk.Button(window, text="Choose this option", command=check_value)
     decide.pack()
 
+    path = tk.StringVar()
     search_folder_button = tk.Button(window, text="Choose folder", command=choose_folder)
+
+    encrypt_button = tk.Button(window, text="Encrypt", command=lambda: encrypt_folder(path.get(), "g"))
+    
+    
+    label = tk.Label(window, text=":)")
+    label.pack()
+    
     tk.mainloop()
     
 if __name__ == '__main__':
