@@ -35,35 +35,31 @@ cd ual-cryptography
 
 - **Encrypt files**:
 
-    Run the application and choose option 1:
+  Run the application and choose option to encrypt:
 
-    ```bash
-    python3 encrypt.py
-    ```
+  ```bash
+  python3 encrypt.py
+  ```
 
-    Input the folder path where the files to be encrypted are located.
+  Input the folder path where the files to be encrypted are located.
 
-    ```bash
-    example
-    ```
-
-    You can choose to decrypt later via the main menu.
+  You can choose to decrypt later via the main menu.
 
 - **Decrypt files**:
 
-    Run the application and choose option 2:
+  Run the application and choose option to decrypt:
 
-    ```bash
-    python3 encrypt.py
-    ```
+  ```bash
+  python3 encrypt.py
+  ```
 
-    Input the folder path where the encrypted files are located.
+  Input the folder path where the encrypted files are located.
 
-    Enter the path to the key used during encryption. All encrypted files will be decrypted, and the original filenames will be restored.
+  Enter the path to the key used during encryption. All encrypted files will be decrypted, and the original filenames will be restored.
 
-    ```bash
-    example.key
-    ```
+  ```bash
+  example.key
+  ```
 
 ## Example Workflow
 
@@ -78,7 +74,6 @@ Decrypt a folder: You can later use the same password to restore the original fi
 - Discuss using absolute paths for folder input to avoid potential path issues.
 - Discuss file formats.
 - Add encrypting and decrypting logic to encrypt whole folder to one file
-- Implement better error handling and test.
-- Add GUI.
+- Implement better error handling(does GUI errors counts?) and test.
 - Discuss Password
 - improve code structure
