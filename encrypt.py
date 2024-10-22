@@ -1,42 +1,10 @@
 import os
-from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 from utils.file_utils import *
-import json
+from crypto.aes import *
+from crypto.rsa import *
 import tkinter as tk
 from tkinter import ttk, messagebox
-
-def encode(file, key):
-    # Get the file extension
-    base_name, file_extension = os.path.splitext(file)
-
-    try:
-        print(f"Encrypting file: {file}.")
-        
-        # Create the encrypted file with .enc extension
-        encrypted_file_path = f"{base_name}.enc"
-
-        file_data = read_file(file) # Read the file content
-        iv = get_random_bytes(16)  # Generate a random 16-byte initialization vector
-
-        # Create an AES cipher object with the key and IV and encrypt data
-        cipher = AES.new(key, AES.MODE_CFB, iv)
-
-        data_to_encrypt = json.dumps({
-            'file_extension': file_extension,
-            'file_content': file_data.hex()
-        }).encode()
-
-        encrypted_data = iv + cipher.encrypt(data_to_encrypt)
-        write_file(encrypted_file_path, encrypted_data) #write data to file
-        os.remove(file) # Delete the original file
-
-        return True  # Indicate that encryption was successful
-    
-    except Exception as e:
-        display_error(f"Error encrypting {file}: {e}")
-        return False  # Indicate that encryption was not successful
-
 
 def encrypt_folder(folder_path, option):
     # Lists to keep track of encrypted and failed files
@@ -44,9 +12,11 @@ def encrypt_folder(folder_path, option):
     failed_files = []
 
     #Generate and save the key
-    key_file_path = f"{folder_path}.key"
     key = get_random_bytes(16)
-    write_file(key_file_path, key)
+    
+    #TODO don't save the aes key, it's passed and encrypted with rsa
+    key_file_path = f"{folder_path}.key" #TODO remove
+    write_file(key_file_path, key) #TODO remove
 
     # List all files in the folder
     for file_name in os.listdir(folder_path):
@@ -81,39 +51,9 @@ def encrypt_folder(folder_path, option):
             info += f"- {failed_file}\n"
         if option == "g":
             messagebox.showerror("Error encrypting files", f"Error encrypting {info}")
+    return key
 
-
-def decode(file, key):
-    try:
-        print(f"Decrypting file: {file}.")
-        
-        # Get the original file name
-        base_name, _ = os.path.splitext(file)
-
-        file_data = read_file(file) # Read the encrypted file content
-
-        # Create an AES cipher object with the key and IV and decrypt data
-        iv = file_data[:16]
-        encrypted_content = file_data[16:]
-        cipher = AES.new(key, AES.MODE_CFB, iv)
-        decrypted_data = cipher.decrypt(encrypted_content)
-
-        #parse json structure
-        decrypted_json = json.loads(decrypted_data.decode())
-        file_extension = decrypted_json['file_extension']
-        file_content = bytes.fromhex(decrypted_json['file_content'])
-        
-        # Write the decrypted data to a new file
-        decrypted_file_path = base_name + file_extension  
-        write_file(decrypted_file_path, file_content)
-        
-        # Delete the encrypted file
-        os.remove(file)
-    except Exception as e:
-        display_error(f"Error decrypting {file}: {e}")
-    
-
-def decrypt_folder(folder_path, key_path, option):
+def decrypt_folder(folder_path, key, option):
     # Check for .enc files in the specified folder
     enc_files = [file_name for file_name in os.listdir(folder_path) if file_name.endswith('.enc')]
 
@@ -125,9 +65,6 @@ def decrypt_folder(folder_path, key_path, option):
             
         return
     
-    # Load the key from the key file
-    key = read_file(key_path)
-    
     for file_name in os.listdir(folder_path):
         if file_name.endswith('.enc'):  # Assuming encrypted files have .enc extension
             file_path = os.path.join(folder_path, file_name)
@@ -136,6 +73,23 @@ def decrypt_folder(folder_path, key_path, option):
     if option == "g":
         messagebox.showinfo("Decryption complete", "Decryption complete.")
 
+def test_rsa_encryption():
+    folder_name = "example"
+    public_key_name = "name_public.pem"
+
+    aes_key = encrypt_folder(folder_name, "dupa")
+    rsa_encryption(public_key_name, aes_key, folder_name)
+
+def test_rsa_decryption():
+    folder_name = "example"
+    password = "password"
+    private_key_name = "name_private.pem"
+    aes_key_name = "example.key.enc"
+    aes_key = rsa_decryption(password, private_key_name, aes_key_name)
+    decrypt_folder(folder_name, aes_key, "dupa")
+
+def test_rsa_key_generation():
+    generate_rsa_keys("name", "password")
 
 
 def main():
@@ -182,7 +136,7 @@ def main():
             search_folder_button.pack()
             search_key_button.pack()
         else:
-            messagebox.showerror("Wrong option", "Please choose on of the available options")
+            messagebox.showerror("Wrong option", "Please choose one of the available options")
             
     def choose_folder():
         folder_path = folder_input("g")
@@ -208,7 +162,7 @@ def main():
             
             encrypt_button.forget()
         elif op == "d":
-            decrypt_folder(path.get(), key_path.get(), "g")
+            decrypt_folder(path.get(), read_file(key_path.get()), "g")
             
             search_key_button.forget()
             decrypt_button.forget()
@@ -223,8 +177,9 @@ def main():
         check.set(False)
         
     window = tk.Tk()
-    window.geometry("400x100")
+    window.geometry("500x200")
     window.title("Encryption and Decryption App")
+    window.option_add("*Font", "40")
     
     option = tk.StringVar()
     option.set("Encrypt")
@@ -244,7 +199,15 @@ def main():
     encrypt_button = tk.Button(window, text="Encrypt", command=lambda: post_encrypt_decrypt("e"))
     
     decrypt_button = tk.Button(window, text="Decrypt", command=lambda: post_encrypt_decrypt("d"))
-    
+
+    #TODO replace with the actual function (to choose in options menu)
+    test_button1 = tk.Button(window, text="Generate RSA keys (test)", command = test_rsa_key_generation)
+    test_button2 = tk.Button(window, text="RSA encryption (test, do after generating keys)", command=lambda: test_rsa_encryption())
+    test_button3 = tk.Button(window, text="RSA decryption (test, do after rsa encryption)", command=lambda: test_rsa_decryption())
+    test_button1.pack()
+    test_button2.pack()
+    test_button3.pack()
+
     tk.mainloop()
     
 if __name__ == '__main__':

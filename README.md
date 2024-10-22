@@ -61,6 +61,14 @@ cd ual-cryptography
   example.key
   ```
 
+- **Generate RSA keys**
+
+  Generate a pair of RSA keys - public and private
+
+- **Encrypt with RSA**
+
+- **Decrypt with RSA**
+
 ## Example Workflow
 
 Encrypt a folder: After entering the folder path and password, files like example.txt will be encrypted and renamed to example.enc.
@@ -72,8 +80,8 @@ Decrypt a folder: You can later use the same password to restore the original fi
 - Discuss renaming files after encryption to e.g. image_encrypted.png
 - Discuss recursively encrypting every subfolder and file in the selected folder.
 - Discuss using absolute paths for folder input to avoid potential path issues.
-- Discuss file formats.
 - Add encrypting and decrypting logic to encrypt whole folder to one file
 - Implement better error handling(does GUI errors counts?) and test
 - Discuss Password
 - improve code structure
+- GUI for task3(public-private)

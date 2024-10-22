@@ -1,4 +1,5 @@
 *.enc
 *.key
+*.pem
 __pycache__/
 .idea/
