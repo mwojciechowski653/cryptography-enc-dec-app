@@ -38,10 +38,6 @@ def encrypt_folder(folder_path, option):
 
     #Generate and save the key
     key = get_random_bytes(16)
-    
-    #TODO don't save the aes key, it's passed and encrypted with rsa
-    key_file_path = f"{folder_path}.key" #TODO remove
-    write_file(key_file_path, key) #TODO remove
 
     # Start processing the folder and its subfolders
     process_folder(folder_path, key, encrypted_files, failed_files, option)
@@ -155,6 +151,8 @@ def main():
             options_dropdown.forget()
 
             search_folder_button.pack()
+            name_label.pack()
+            name_entry.pack()
         elif option.get() == "Decrypt":
             decide.forget()
             options_dropdown.forget()
@@ -180,6 +178,9 @@ def main():
         path.set("")
         key_path.set("")
         check.set(False)
+        name.set("")
+        password.set("")
+        
     def create_key():
         name = name_entry.get()
         password = password_entry.get()
@@ -212,6 +213,7 @@ def main():
                 decrypt_button.pack()
             else:
                 check.set(True)
+                
     def choose_key():
         file_path = key_file_input("g")
         key_path.set(file_path)
@@ -222,9 +224,17 @@ def main():
             
     def post_encrypt_decrypt(op):
         if op == "e":
-            encrypt_folder(path.get(), "g")
+            try:
+                RSA.import_key(read_file(name.get()))
+            except:
+                messagebox.showerror("Wrong key name", "This name is wrong")
+                return
             
+            aes_key = encrypt_folder(path.get(), "g")
+            rsa_encryption(name.get(), aes_key, "content")
+
             encrypt_button.forget()
+            
         elif op == "d":
             decrypt_folder(path.get(), read_file(key_path.get()), "g")
             
@@ -232,6 +242,8 @@ def main():
             decrypt_button.forget()
 
         search_folder_button.forget()
+        name_label.forget()
+        name_entry.forget()
         
         show_menu()
         
@@ -255,28 +267,26 @@ def main():
     key_path = tk.StringVar()
     check = tk.BooleanVar()
     check.set(False)
+    
     search_folder_button = tk.Button(window, text="Choose folder", command=choose_folder)
     search_key_button = tk.Button(window, text="Choose key file", command=choose_key)
 
     encrypt_button = tk.Button(window, text="Encrypt", command=lambda: post_encrypt_decrypt("e"))
-    
     decrypt_button = tk.Button(window, text="Decrypt", command=lambda: post_encrypt_decrypt("d"))
-    
+
     # key gen gui
     name = tk.StringVar()
     password = tk.StringVar()
     
-    name_label = tk.Label(window, text="Enter name for your keys")
+    name_label = tk.Label(window, text="Enter name for your key")
     name_entry = tk.Entry(window, textvariable=name)
-    password_label = tk.Label(window, text="Enter password for your keys")
+    password_label = tk.Label(window, text="Enter password for your key")
     password_entry = tk.Entry(window, textvariable=password)
     
-    create_keys_button = tk.Button(window, text="Create key", command=create_key)
+    create_keys_button = tk.Button(window, text="Create keys", command=create_key)
 
     #TODO replace with the actual function (to choose in options menu)
-    # test_button2 = tk.Button(window, text="RSA encryption (test, do after generating keys)", command=lambda: test_rsa_encryption())
     # test_button3 = tk.Button(window, text="RSA decryption (test, do after rsa encryption)", command=lambda: test_rsa_decryption())
-    # test_button2.pack()
     # test_button3.pack()
 
     tk.mainloop()
