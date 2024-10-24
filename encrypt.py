@@ -121,7 +121,7 @@ def test_rsa_key_generation():
 def main():
     
     # 
-    # TERMINAL VERSION
+    # TERMINAL VERSION(without keys)
     # 
     # while True:
     #     print("Choose an option:")
@@ -161,8 +161,46 @@ def main():
 
             search_folder_button.pack()
             search_key_button.pack()
+        elif option.get() == "Generate keys":
+            decide.forget()
+            options_dropdown.forget()
+            
+            name_label.pack()
+            name_entry.pack()
+            password_label.pack()
+            password_entry.pack()
+            create_keys_button.pack()
         else:
             messagebox.showerror("Wrong option", "Please choose one of the available options")
+            
+    def show_menu():
+        option.set("Encrypt")
+        options_dropdown.pack()
+        decide.pack()
+        path.set("")
+        key_path.set("")
+        check.set(False)
+    def create_key():
+        name = name_entry.get()
+        password = password_entry.get()
+        
+        if len(name) < 1:
+            messagebox.showerror("Too short name", "Name for your keys cannot be empty")
+            return
+        if len(password) < 1:
+            messagebox.showerror("Too short password", "Password for your private key cannot be empty")
+            return
+        
+        generate_rsa_keys(name, password)
+        messagebox.showinfo("Keys generated", "Your keys are successfully created")
+        
+        name_label.forget()
+        name_entry.forget()
+        password_label.forget()
+        password_entry.forget()
+        create_keys_button.forget()
+        
+        show_menu()
             
     def choose_folder():
         folder_path = folder_input("g")
@@ -195,26 +233,24 @@ def main():
 
         search_folder_button.forget()
         
-        option.set("Encrypt")
-        options_dropdown.pack()
-        decide.pack()
-        path.set("")
-        key_path.set("")
-        check.set(False)
+        show_menu()
         
+    # main window
     window = tk.Tk()
     window.geometry("500x200")
     window.title("Encryption and Decryption App")
     window.option_add("*Font", "40")
     
+    # main menu
     option = tk.StringVar()
     option.set("Encrypt")
-    options_dropdown = ttk.Combobox(window, textvariable=option, values=("Encrypt", "Decrypt"))
+    options_dropdown = ttk.Combobox(window, textvariable=option, values=("Encrypt", "Decrypt", "Generate keys"))
     options_dropdown.pack()
 
     decide = tk.Button(window, text="Choose this option", command=check_value)
     decide.pack()
 
+    # encrypt/decrypt gui
     path = tk.StringVar()
     key_path = tk.StringVar()
     check = tk.BooleanVar()
@@ -225,14 +261,23 @@ def main():
     encrypt_button = tk.Button(window, text="Encrypt", command=lambda: post_encrypt_decrypt("e"))
     
     decrypt_button = tk.Button(window, text="Decrypt", command=lambda: post_encrypt_decrypt("d"))
+    
+    # key gen gui
+    name = tk.StringVar()
+    password = tk.StringVar()
+    
+    name_label = tk.Label(window, text="Enter name for your keys")
+    name_entry = tk.Entry(window, textvariable=name)
+    password_label = tk.Label(window, text="Enter password for your keys")
+    password_entry = tk.Entry(window, textvariable=password)
+    
+    create_keys_button = tk.Button(window, text="Create key", command=create_key)
 
     #TODO replace with the actual function (to choose in options menu)
-    test_button1 = tk.Button(window, text="Generate RSA keys (test)", command = test_rsa_key_generation)
-    test_button2 = tk.Button(window, text="RSA encryption (test, do after generating keys)", command=lambda: test_rsa_encryption())
-    test_button3 = tk.Button(window, text="RSA decryption (test, do after rsa encryption)", command=lambda: test_rsa_decryption())
-    test_button1.pack()
-    test_button2.pack()
-    test_button3.pack()
+    # test_button2 = tk.Button(window, text="RSA encryption (test, do after generating keys)", command=lambda: test_rsa_encryption())
+    # test_button3 = tk.Button(window, text="RSA decryption (test, do after rsa encryption)", command=lambda: test_rsa_decryption())
+    # test_button2.pack()
+    # test_button3.pack()
 
     tk.mainloop()
     
