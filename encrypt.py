@@ -4,7 +4,7 @@ from utils.file_utils import *
 from crypto.aes import *
 from crypto.rsa import *
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, simpledialog
 
 # Function to recursively process folders and files
 def process_folder(path, key, encrypted_files, failed_files, option):
@@ -249,7 +249,10 @@ def main():
                 return
             
             aes_key = encrypt_folder(path.get(), "g")
-            rsa_encryption(name.get(), aes_key, "content")
+            content = simpledialog.askstring("Content name", "Enter name for your encrypted aes key:")
+            if content == "":
+                content = "content"
+            rsa_encryption(name.get(), aes_key, content)
 
             encrypt_button.forget()
             name_button_e.forget()
