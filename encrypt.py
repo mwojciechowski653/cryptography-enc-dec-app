@@ -150,9 +150,8 @@ def main():
             decide.forget()
             options_dropdown.forget()
 
+            name_button.pack()
             search_folder_button.pack()
-            name_label.pack()
-            name_entry.pack()
         elif option.get() == "Decrypt":
             decide.forget()
             options_dropdown.forget()
@@ -208,6 +207,10 @@ def main():
         path.set(folder_path)
         if option.get() == "Encrypt":
             encrypt_button.pack()
+            if check.get():
+                encrypt_button.pack()
+            else:
+                check.set(True)
         if option.get() == "Decrypt":
             if check.get():
                 decrypt_button.pack()
@@ -221,6 +224,15 @@ def main():
             decrypt_button.pack()
         else:
             check.set(True)
+            
+    def choose_key_name(op):
+        file_path = key_file_input("k")
+        name.set(file_path)
+        if op == "e":
+            if check.get():
+                encrypt_button.pack()
+            else:
+                check.set(True)
             
     def post_encrypt_decrypt(op):
         if op == "e":
@@ -242,8 +254,7 @@ def main():
             decrypt_button.forget()
 
         search_folder_button.forget()
-        name_label.forget()
-        name_entry.forget()
+        name_button.forget()
         
         show_menu()
         
@@ -274,6 +285,7 @@ def main():
     encrypt_button = tk.Button(window, text="Encrypt", command=lambda: post_encrypt_decrypt("e"))
     decrypt_button = tk.Button(window, text="Decrypt", command=lambda: post_encrypt_decrypt("d"))
 
+    name_button = tk.Button(window, text="Choose your key", command=lambda: choose_key_name("e"))
     # key gen gui
     name = tk.StringVar()
     password = tk.StringVar()

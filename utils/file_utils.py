@@ -60,17 +60,24 @@ def key_file_input(option):
         if not os.path.isfile(file_path):
             display_error("Invalid file path! Please try again.")
             
-            if option == "g":
+            if option == "g" or option == "k":
                 messagebox.showerror("Invalid file path", "Invalid file path! Please try again.")
             continue  # Prompt user again
         
         # Check if the file has a .key extension
-        if not file_path.endswith('.key'):
-            display_error("File must have a .key extension! Please try again.")
-            
-            if option == "g":
-                messagebox.showerror(".key extension error", "File must have a .key extension! Please try again.")
-            continue  # Prompt user again
+        if option != "k":
+            if not file_path.endswith('.key'):
+                display_error("File must have a .key extension! Please try again.")
+                
+                if option == "g":
+                    messagebox.showerror(".key extension error", "File must have a .key extension! Please try again.")
+                continue  # Prompt user again
+        
+        if option == "k":
+            if not file_path.endswith('.pem'):
+                display_error("Key must have a .pem extension! Please try again.")
+                messagebox.showerror(".pem extension error", "Key must have a .pem extension! Please try again.")
+                continue  # Prompt user again
         
         # If everything is valid, return the file path
         return file_path
