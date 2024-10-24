@@ -57,15 +57,16 @@ def key_file_input(option):
             file_path = filedialog.askopenfilename(title="Choose key file")
         
         # Check if the provided path is a valid file
+        # if option != "enc":
         if not os.path.isfile(file_path):
             display_error("Invalid file path! Please try again.")
-            
+                
             if option == "g" or option == "k":
                 messagebox.showerror("Invalid file path", "Invalid file path! Please try again.")
             continue  # Prompt user again
         
         # Check if the file has a .key extension
-        if option != "k":
+        if option == "t" or option == "g":
             if not file_path.endswith('.key'):
                 display_error("File must have a .key extension! Please try again.")
                 
@@ -77,6 +78,12 @@ def key_file_input(option):
             if not file_path.endswith('.pem'):
                 display_error("Key must have a .pem extension! Please try again.")
                 messagebox.showerror(".pem extension error", "Key must have a .pem extension! Please try again.")
+                continue  # Prompt user again
+            
+        if option == "enc":
+            if not file_path.endswith('.enc'):
+                display_error("Content must have a .enc extension! Please try again.")
+                messagebox.showerror(".enc extension error", "Content must have a .enc extension! Please try again.")
                 continue  # Prompt user again
         
         # If everything is valid, return the file path
