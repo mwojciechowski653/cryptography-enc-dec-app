@@ -1,0 +1,12 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\crypto",
+    "\\example",
+    "\\example\\nest",
+    "\\example\\nest\\nest2",
+    "\\utils"
+  ],
+  "SelectedNode": "\\crypto\\aes.py",
+  "PreviewInSolutionExplorer": false
+}
