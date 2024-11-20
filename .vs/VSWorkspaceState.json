@@ -1,12 +1,6 @@
 {
   "ExpandedNodes": [
-    "",
-    "\\crypto",
-    "\\example",
-    "\\example\\nest",
-    "\\example\\nest\\nest2",
-    "\\utils"
+    ""
   ],
-  "SelectedNode": "\\encrypt.py",
   "PreviewInSolutionExplorer": false
 }

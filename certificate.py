@@ -148,8 +148,16 @@ class Certificate:
                 return None
             public_key = certificate.public_key()                                               # getting user public key from certificate
             
+
             file_path = os.path.join(Certificate.project_folder, f"cer_public.pem")  
-            write_file(file_path, public_key)
+            
+            pem_public_key = public_key.public_bytes(
+                encoding=serialization.Encoding.PEM,  # Format PEM
+                format=serialization.PublicFormat.SubjectPublicKeyInfo  # Standardowy format klucza publicznego
+                )
+
+            write_file(file_path, pem_public_key)
+
 
             return public_key
 
