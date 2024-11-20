@@ -1,8 +1,11 @@
 import os
 from Crypto.Random import get_random_bytes
+from certificate import Certificate
 from utils.file_utils import *
 from crypto.aes import *
 from crypto.rsa import *
+from admin import *
+from certificate import *
 import tkinter as tk
 from tkinter import ttk, messagebox, simpledialog
 
@@ -259,9 +262,11 @@ def main():
             
         elif op == "d":
             try:
+                nam = name.get()
+                pa = password.get()
                 RSA.import_key(read_file(name.get()), passphrase=password.get())
             except:
-                messagebox.showerror("Wrong key/password", "This key or password is wrong")
+                messagebox.showerror("Wrong key/password", "This key or password is wrong")                
                 return
 
             aes_key = rsa_decryption(password.get(), name.get(), key_path.get())
@@ -277,6 +282,12 @@ def main():
         
         show_menu()
         
+
+    # creating admin
+    admin = Admin()
+    admin.generate_keys()
+    admin.encrypt_authority_key()
+
     # main window
     window = tk.Tk()
     window.geometry("500x200")
@@ -317,6 +328,13 @@ def main():
     
     create_keys_button = tk.Button(window, text="Create keys", command=create_key)
 
+    certificate = Certificate(name.get(), admin)
+    certificate.creating_and_signing_certificate(admin)
+
+    # choosing the certificate to check validity
+    certificate_list = certificate.get_certificate_list()
+    certificate.check_certificate_validity(certificate_list[0])
+    
     tk.mainloop()
     
 if __name__ == '__main__':

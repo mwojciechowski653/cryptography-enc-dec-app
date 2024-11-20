@@ -1,4 +1,4 @@
-import os
+import os, shutil
 from tkinter import messagebox, filedialog
 
 def display_error(message):
@@ -11,6 +11,20 @@ def read_file(file_path):
 def write_file(file_path, data):
     with open(file_path, 'wb') as f:
         f.write(data)
+        
+def moving_files(files, source_folder, destination_folder):
+    os.makedirs(destination_folder, exist_ok=True)
+
+    for filename in files:
+        source_file = os.path.join(source_folder, filename)
+        destination_file = os.path.join(destination_folder, filename)
+    
+        # Moving the files
+        if os.path.isfile(source_file):
+            shutil.move(source_file, destination_file)
+            #print(f"Moved: {filename}")
+
+        #print("All files were moved")
 
 def folder_input(option):
     while True:
