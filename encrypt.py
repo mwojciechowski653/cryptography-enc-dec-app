@@ -259,9 +259,11 @@ def main():
             
         elif op == "d":
             try:
+                nam = name.get()
+                pa = password.get()
                 RSA.import_key(read_file(name.get()), passphrase=password.get())
             except:
-                messagebox.showerror("Wrong key/password", "This key or password is wrong")
+                messagebox.showerror("Wrong key/password", "This key or password is wrong")                
                 return
 
             aes_key = rsa_decryption(password.get(), name.get(), key_path.get())
