@@ -112,8 +112,16 @@ class Certificate:
         else:
             print("Certificate folder doesn't exist")
             
+    def get_common_name_from_certificate(self, certificate):
+        subject = certificate.subject
+        common_name = subject.get_attributes_for_oid(NameOID.COMMON_NAME)
+    
+        if common_name:                            
+            return common_name[0].value
+        return None 
+
     def check_certificate_validity(self, certificate, admin:Admin):
-        #admin.decrypt_key()
+        admin.decrypt_key()
 
         try:
             # Używamy nowej właściwości, która zwraca datę z przypisaną strefą czasową (UTC)
@@ -149,7 +157,7 @@ class Certificate:
             public_key = certificate.public_key()                                               # getting user public key from certificate
             
 
-            file_path = os.path.join(Certificate.project_folder, f"cer_public.pem")  
+            file_path = os.path.join(Certificate.project_folder, f"{self.get_common_name_from_certificate(certificate)}_certificate_public.pem")  
             
             pem_public_key = public_key.public_bytes(
                 encoding=serialization.Encoding.PEM,  # Format PEM
@@ -177,10 +185,7 @@ if __name__ == '__main__':
         #admin.generate_keys()
         #admin.encrypt_authority_key()
         return admin
-
-    #test_rsa_key_generation()
-    #test_rsa_encryption()
-    #test_rsa_decryption()
+    
     admin = creating_admin()
     certificate = Certificate("name", admin)
     #certificate.creating_and_signing_certificate(admin)
