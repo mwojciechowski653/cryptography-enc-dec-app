@@ -3,3 +3,6 @@
 *.pem
 __pycache__/
 .idea/
+.vs/
+
+
