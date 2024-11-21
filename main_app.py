@@ -92,10 +92,6 @@ def main():
         
         certificate = Certificate(name, admin)
         certificate.creating_and_signing_certificate(admin)
-
-        # choosing the certificate to check validity
-        #certificate_list = certificate.get_certificate_list()
-        #certificate.check_certificate_validity(certificate_list[0])
         
         name_label.forget()
         name_entry.forget()
@@ -182,6 +178,11 @@ def main():
         
         show_menu()
         
+
+    # !!! new option !!!
+    # choosing the certificate to check validity
+    # certificate_list = certificate.get_certificate_list()
+    # certificate.check_certificate_validity(certificate_list[0])    
 
     # creating admin
     admin.generate_keys()

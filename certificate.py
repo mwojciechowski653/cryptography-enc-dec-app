@@ -31,13 +31,13 @@ class Certificate:
         self.authority_name = admin.name                                                # authority name
         self.authority_private_key = ""                                                 # authority private key
     
-    def get_public_key(self, public_key_path):                                          # getting public key from the path
+    def get_public_key(self, public_key_path):                                                          # getting public key from the path and returning it as an object
         with open(public_key_path, "rb") as key_file:
             public_key =  serialization.load_pem_public_key(key_file.read())
         return public_key
     
-    def get_issuer_private_key(self, admin:Admin):                                                      # getting user private key 
-        private_key_path = os.path.join(Certificate.key_folder, f"{admin.name}_private.pem")        # user private key path
+    def get_issuer_private_key(self, admin:Admin):                                                      # getting user private key and returning it as an object
+        private_key_path = os.path.join(Certificate.key_folder, f"{admin.name}_private.pem")            # user private key path
 
         with open(private_key_path, "rb") as key_file:
             private_key = serialization.load_pem_private_key(
@@ -48,25 +48,21 @@ class Certificate:
         
 
     def creating_and_signing_certificate(self, admin:Admin):
-        # Creating authority
-        #admin = self.creating_admin()
-        #self.authority_name = admin.name
+        admin.decrypt_key()                                                                             # decrypting authority keys 
         
-        admin.decrypt_key()                                                                     # decrypting authority keys 
-        
-        subject = Name([NameAttribute(NameOID.COMMON_NAME, self.subject_name)])                 # creating subject identity, Name - a list of attributes, NameAttribute - one attribute, NameOID.COMMON_NAME - inform us that it's a name of subject
-        issuer = Name([NameAttribute(NameOID.COMMON_NAME, self.authority_name)])                # creating authority identity
-        serial_number = random.randint(1, 2**64 - 1)                                            # generating serial number in 64-bit range
+        subject = Name([NameAttribute(NameOID.COMMON_NAME, self.subject_name)])                         # creating subject identity, Name - a list of attributes, NameAttribute - one attribute, NameOID.COMMON_NAME - inform us that it's a name of subject
+        issuer = Name([NameAttribute(NameOID.COMMON_NAME, self.authority_name)])                        # creating authority identity
+        serial_number = random.randint(1, 2**64 - 1)                                                    # generating serial number in 64-bit range
 
         user_public_key_path = os.path.join(Certificate.project_folder, f"{self.subject_name}_public.pem") 
-        public_key = self.get_public_key(user_public_key_path)                                      # user public key
-        builder = CertificateBuilder(
-            issuer_name = issuer,                                                                   # who is making an certificate
-            subject_name = subject,                                                                 # who need to have certificate
-            serial_number=serial_number,                                                            # serial number
-            public_key = public_key,                                                                # user public key
-            not_valid_before = datetime.datetime.now(timezone.utc),                                 # when certificate was created - time right now
-            not_valid_after = datetime.datetime.now(timezone.utc) + datetime.timedelta(days=365),   # when certificate lasts - time year later
+        public_key = self.get_public_key(user_public_key_path)                                          # user public key
+        builder = CertificateBuilder(                                                                   # building the certificate
+            issuer_name = issuer,                                                                       # who is making an certificate
+            subject_name = subject,                                                                     # who need to have certificate
+            serial_number = serial_number,                                                              # serial number
+            public_key = public_key,                                                                    # user public key
+            not_valid_before = datetime.datetime.now(timezone.utc),                                     # when certificate was created - time right now
+            not_valid_after = datetime.datetime.now(timezone.utc) + datetime.timedelta(days=365),       # when certificate lasts - time year later
             )
         
         private_key = self.get_issuer_private_key(admin)                                            # authority private key
@@ -98,23 +94,23 @@ class Certificate:
                         try:
                             certificate = load_pem_x509_certificate(certificate_file)
                             Certificate.certificates_list.append(certificate)
-                            print(f"Uploading certificate PEM: {file_name} went correctly")
+                            messagebox.showinfo("Uploading PEM certificate",f"Uploading certificate PEM: {file_name} went correctly")
                             
                         except ValueError:
                             try:
                                 certificate = load_der_x509_certificate(certificate_file)
                                 Certificate.certificates_list.append(certificate)
-                                print(f"Uploading certificate DER: {file_name} went correctly")
+                                messagebox.showinfo("Uploading DER certificate",f"Uploading certificate DER: {file_name} went correctly")
                                 
                             except ValueError:
-                                print(f"Uploading certificate: {file_name} failed")
+                                messagebox.showerror("Uploading certificate error", f"Uploading certificate: {file_name} failed")
                                 
                     except Exception as ex:
-                        print(f"Opening certificate {file_name} file failed")
+                        messagebox.showerror("Opening certificate error", f"Opening certificate {file_name} file failed")
         else:
-            print("Certificate folder doesn't exist")
+            messagebox.showerror("No folder error", "Certificate folder doesn't exist")
             
-    def get_common_name_from_certificate(self, certificate):                                # getting name of the certificate
+    def get_common_name_from_certificate(self, certificate):                                # getting name of the certificate's user
         subject = certificate.subject
         common_name = subject.get_attributes_for_oid(NameOID.COMMON_NAME)
     
@@ -126,17 +122,16 @@ class Certificate:
         admin.decrypt_key()
 
         try:
-            # Używamy nowej właściwości, która zwraca datę z przypisaną strefą czasową (UTC)
             now = datetime.datetime.now(datetime.timezone.utc)
 
-            # Zamiast używać `not_valid_before` i `not_valid_after`, używamy `not_valid_before_utc` i `not_valid_after_utc`
             certificate_not_valid_before = certificate.not_valid_before_utc
             certificate_not_valid_after = certificate.not_valid_after_utc
 
             if certificate_not_valid_before <= now <= certificate_not_valid_after:                                      # checking if it does not lasts
-                print(f"Certificate {certificate.serial_number}is within the validity period")
+                messagebox.showinfo("Certificate is valid", f"Certificate {certificate.serial_number}is within the validity period")
+                messagebox.showinfo("Certificate is valid", f"Certificate {certificate.serial_number}is within the validity period")
             else:
-                print(f"Certificate {certificate.serial_number} is expired")
+                messagebox.showerror("Certificate is not valid", f"Certificate {certificate.serial_number} is expired")
                 return False
             
             try:
@@ -149,21 +144,21 @@ class Certificate:
                     padding.PKCS1v15(),                                                         # specify the padding scheme
                     certificate.signature_hash_algorithm,                                       # hashing algorithm used in signature
                 )
-                print(f"The signature of certificate {certificate.serial_number} is correct")
+                messagebox.showinfo("Certificate is valid",f"The signature of certificate {certificate.serial_number} is correct")
             except InvalidSignature:
-                print(f"The signature of certificate {certificate.serial_number} is invalid.")
+                messagebox.showerror("Certificate is invalid", f"The signature of certificate {certificate.serial_number} is invalid.")
                 return None
             except Exception as e:
-                print(f"Error during certificate signature verification {certificate.serial_number}: {e}")
+                messagebox.showerror("Error", f"Error during certificate signature verification {certificate.serial_number}: {e}")
                 return None
             public_key = certificate.public_key()                                               # getting user public key from certificate
             
 
             file_path = os.path.join(Certificate.project_folder, f"{self.get_common_name_from_certificate(certificate)}_certificate_public.pem")  
             
-            pem_public_key = public_key.public_bytes(
-                encoding=serialization.Encoding.PEM,  # Format PEM
-                format=serialization.PublicFormat.SubjectPublicKeyInfo  # Standardowy format klucza publicznego
+            pem_public_key = public_key.public_bytes(                                           # changing public key object to PEM format
+                encoding=serialization.Encoding.PEM,                                            # PEM format
+                format=serialization.PublicFormat.SubjectPublicKeyInfo                          # standard public key format
                 )
 
             write_file(file_path, pem_public_key)
@@ -172,7 +167,7 @@ class Certificate:
             return public_key
 
         except Exception as e:
-            print(f"Error during certificate verification {certificate.serial_number}: {e}")
+            messagebox.showerror("Error", f"Error during certificate verification {certificate.serial_number}: {e}")
             return None
         
     @classmethod

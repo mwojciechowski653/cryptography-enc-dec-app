@@ -32,7 +32,7 @@ class Admin:
         try:
             RSA.import_key(read_file(public_key_name))                                                                                  # importing the public key into an RSA object
         except:
-            print("Wrong key name", "This name is wrong")
+            messagebox.showerror("Wrong key name", "This name is wrong")
             return
             
         aes_key = encrypt_folder(self.key_folder_name, "t")                                                                             # encryption in aes
@@ -45,7 +45,7 @@ class Admin:
         try:
             RSA.import_key(read_file(private_key_name), passphrase = self.key_password)                                                 # private key manager key and key manager password
         except:
-            print("Wrong key/password", "This key or password is wrong")
+            messagebox.showerror("Wrong key/password", "This key or password is wrong")
             return
 
         aes_key = rsa_decryption(self.key_password, private_key_name, "KeyFolder.key.enc")                                              # key manager password, private manager key, folder encrypted - .key.enc
