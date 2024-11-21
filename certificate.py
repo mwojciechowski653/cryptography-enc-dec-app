@@ -52,7 +52,7 @@ class Certificate:
         #admin = self.creating_admin()
         #self.authority_name = admin.name
         
-        #admin.decrypt_key()                                                                     # decrypting authority keys 
+        admin.decrypt_key()                                                                     # decrypting authority keys 
         
         subject = Name([NameAttribute(NameOID.COMMON_NAME, self.subject_name)])                 # creating subject identity, Name - a list of attributes, NameAttribute - one attribute, NameOID.COMMON_NAME - inform us that it's a name of subject
         issuer = Name([NameAttribute(NameOID.COMMON_NAME, self.authority_name)])                # creating authority identity

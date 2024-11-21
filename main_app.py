@@ -10,7 +10,8 @@ from tkinter import ttk, messagebox, simpledialog
 
 
 def main():
-    
+    admin = Admin()
+
     # 
     # TERMINAL VERSION(without keys)
     # 
@@ -89,8 +90,8 @@ def main():
         generate_rsa_keys(name, password)
         messagebox.showinfo("Keys generated", "Your keys are successfully created")
         
-        #certificate = Certificate(name.get(), admin)
-        #certificate.creating_and_signing_certificate(admin)
+        certificate = Certificate(name, admin)
+        certificate.creating_and_signing_certificate(admin)
 
         # choosing the certificate to check validity
         #certificate_list = certificate.get_certificate_list()
@@ -183,9 +184,8 @@ def main():
         
 
     # creating admin
-    #admin = Admin()
-    #admin.generate_keys()
-    #admin.encrypt_authority_key()
+    admin.generate_keys()
+    admin.encrypt_authority_key()
 
     # main window
     window = tk.Tk()
