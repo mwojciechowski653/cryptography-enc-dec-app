@@ -9,7 +9,7 @@ from datetime import timezone
 import random
 
 from typing import DefaultDict
-from encrypt import *
+from coding import *
 from utils.file_utils import *
 from crypto.aes import *
 from crypto.rsa import *
@@ -168,7 +168,7 @@ class Certificate:
 
             write_file(file_path, pem_public_key)
 
-
+            admin.encrypt_authority_key()
             return public_key
 
         except Exception as e:
@@ -185,7 +185,7 @@ if __name__ == '__main__':
     def creating_admin():
         admin = Admin()
         #admin.generate_keys()
-        #admin.encrypt_authority_key()
+        admin.encrypt_authority_key()
         return admin
 
     admin = creating_admin()

@@ -1,5 +1,5 @@
-﻿import os, shutil
-from encrypt import *
+﻿import os
+from coding import *
 from utils.file_utils import *
 from crypto.aes import *
 from crypto.rsa import *
