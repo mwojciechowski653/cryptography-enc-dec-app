@@ -20,7 +20,7 @@ def generate_rsa_keys(name, password):
 
 
 # Encrypt the data with the public key
-def rsa_encryption(public_key_name, data, name): 
+def rsa_encryption(public_key_name, data, name):
     public_key = RSA.import_key(read_file(public_key_name))
     cipher_rsa = PKCS1_OAEP.new(public_key)
     encrypted_data = cipher_rsa.encrypt(data)

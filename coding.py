@@ -30,13 +30,10 @@ def process_folder(path, key, encrypted_files, failed_files, option):
             process_folder(file_path, key, encrypted_files, failed_files, option)
 
 
-def encrypt_folder(folder_path, option):
+def encrypt_folder(folder_path, option, key):
     # Lists to keep track of encrypted and failed files
     encrypted_files = []
     failed_files = []
-
-    #Generate and save the key
-    key = get_random_bytes(16)
 
     # Start processing the folder and its subfolders
     process_folder(folder_path, key, encrypted_files, failed_files, option)
@@ -54,7 +51,6 @@ def encrypt_folder(folder_path, option):
             info += f"- {failed_file}\n"
         if option == "g":
             messagebox.showerror("Error encrypting files", f"Error encrypting {info}")
-    return key
 
 # Recursive function to process folders and files for decryption
 def process_decryption_folder(path, key, option):
@@ -93,21 +89,3 @@ def decrypt_folder(folder_path, key, option):
     print("Decryption complete.")
     if option == "g":
         messagebox.showinfo("Decryption complete", "Decryption complete.")
-
-def test_rsa_encryption():
-    folder_name = "example"
-    public_key_name = "name_public.pem"
-
-    aes_key = encrypt_folder(folder_name, "dupa")
-    rsa_encryption(public_key_name, aes_key, folder_name)
-
-def test_rsa_decryption():
-    folder_name = "example"
-    password = "password"
-    private_key_name = "name_private.pem"
-    aes_key_name = "example.key.enc"
-    aes_key = rsa_decryption(password, private_key_name, aes_key_name)
-    decrypt_folder(folder_name, aes_key, "dupa")
-
-def test_rsa_key_generation():
-    generate_rsa_keys("name", "password")

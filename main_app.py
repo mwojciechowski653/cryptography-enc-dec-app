@@ -2,16 +2,12 @@ from Crypto.Random import get_random_bytes
 from utils.file_utils import *
 from crypto.aes import *
 from crypto.rsa import *
-from admin import *
-from certificate import *
 from coding import *
 import tkinter as tk
 from tkinter import ttk, messagebox, simpledialog
 
 
 def main():
-    admin = Admin()
-
     # 
     # TERMINAL VERSION(without keys)
     # 
@@ -89,10 +85,7 @@ def main():
         
         generate_rsa_keys(name, password)
         messagebox.showinfo("Keys generated", "Your keys are successfully created")
-        
-        certificate = Certificate(name, admin)
-        certificate.creating_and_signing_certificate(admin)
-        
+
         name_label.forget()
         name_entry.forget()
         password_label.forget()
@@ -147,7 +140,8 @@ def main():
                 messagebox.showerror("Wrong key name", "This name is wrong")
                 return
             
-            aes_key = encrypt_folder(path.get(), "g")
+            aes_key = get_random_bytes(16)
+            encrypt_folder(path.get(), "g", aes_key)
             content = simpledialog.askstring("Content name", "Enter name for your encrypted aes key:")
             if content == "":
                 content = "content"
@@ -158,8 +152,6 @@ def main():
             
         elif op == "d":
             try:
-                nam = name.get()
-                pa = password.get()
                 RSA.import_key(read_file(name.get()), passphrase=password.get())
             except:
                 messagebox.showerror("Wrong key/password", "This key or password is wrong")                
@@ -178,15 +170,6 @@ def main():
         
         show_menu()
         
-
-    # !!! new option !!!
-    # choosing the certificate to check validity
-    # certificate_list = certificate.get_certificate_list()
-    # certificate.check_certificate_validity(certificate_list[0])    
-
-    # creating admin
-    admin.generate_keys()
-    admin.encrypt_authority_key()
 
     # main window
     window = tk.Tk()
