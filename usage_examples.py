@@ -24,24 +24,24 @@ from Crypto.Random import get_random_bytes
 
 # CASE 3
 # ENCRYPTING FILES (admin needed)
-# admin = Admin()
-# certificate = CertificateService()
-# certs = []
-# if os.path.isdir(CERTIFICATE_FOLDER):
-#    for file_name in os.listdir(CERTIFICATE_FOLDER):
-#        certs.append(file_name)
-# 
-# # listbox for choosing what certs to respect
-# choosen_cerst=[]
-# certificate.load_certificate_from_folder(choosen_cerst)
-# liste = CertificateService.get_certificate_list()
-# users = []
-# for cert in liste:
-#    if certificate.check_certificate_validity(cert):   #in general need to check for all certificates
-#        users.append(cert)
-# key = admin.get_decrypted_aes_key()
-# encrypt_folder("example", "g", key)
-# create_header(users, key, "example")
+admin = Admin()
+certificate = CertificateService()
+certs = []
+if os.path.isdir(CERTIFICATE_FOLDER):
+   for file_name in os.listdir(CERTIFICATE_FOLDER):
+       certs.append(file_name)
+
+# listbox for choosing what certs to respect
+choosen_cerst=[]
+certificate.load_certificate_from_folder(choosen_cerst)
+liste = CertificateService.get_certificate_list()
+users = []
+for cert in liste:
+   if certificate.check_certificate_validity(cert):   #in general need to check for all certificates
+       users.append(cert)
+key = admin.get_decrypted_aes_key()
+encrypt_folder("example", "g", key)
+create_header(users, key, "example")
 
 # CASE 4
 # DECRYPTING FILES (NO admin needed)
