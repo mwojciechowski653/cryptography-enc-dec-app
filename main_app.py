@@ -67,17 +67,27 @@ def main():
         confirm_certs_button.pack()
         
     def show_decrypt_menu():
-        pass
+        forget_app_menu()
+
+        go_back_to_app_button_from_decrypt.pack(anchor=tk.W)
+        choose_folder_to_decrypt.pack()
+        choose_private_key.pack()
         
     def go_back_to_app():
         cert_listbox.forget()
         go_back_to_app_button.forget()
+        go_back_to_app_button_from_decrypt.forget()
         confirm_certs_button.forget()
         choose_folder_to_encrypt.forget()
+        choose_folder_to_decrypt.forget()
         cert_listbox.delete("0", tk.END)
-        encrypt_button.forget()
+        encrypt_button2.forget()
+        check.set(False)
+        decrypt_button2.forget()
+        choose_private_key.forget()
         
         show_app_menu()
+
         
     def create_user():
         name = simpledialog.askstring("Enter name", "Please enter your name:")
@@ -127,11 +137,28 @@ def main():
             choose_folder_to_encrypt.forget()
             messagebox.showinfo("Choose certificate", "To proceed choose at least one certificate!")
             
-    def choose_folder():
+    def choose_folder_e():
         folder_path = folder_input("g")
         folder_path_var.set(folder_path)
-        encrypt_button.pack()
+        encrypt_button2.pack()
         
+    def choose_folder_d():
+        folder_path = folder_input("g")
+        folder_path_var.set(folder_path)
+        if check.get():
+            decrypt_button2.pack()
+        else:
+            check.set(True)
+
+    def choose_key():
+        key_path = key_file_input("k")
+        private_key_path.set(key_path)
+        if check.get():
+            decrypt_button2.pack()
+        else:
+            check.set(True)
+
+
     def encrypt():
         admin = Admin()
         key = admin.get_decrypted_aes_key()
@@ -140,7 +167,41 @@ def main():
         
         encrypt_folder(path, "g", key)
         create_header(users, key, path)
+    
+    def decrypt():
+        name = simpledialog.askstring("Enter name", "Please enter your name:")
+        password = simpledialog.askstring("Enter password", "Please enter your password:")
         
+        if name and password:
+            certificate = CertificateService()
+            certs = []
+            if os.path.isdir(CERTIFICATE_FOLDER):
+                for file_name in os.listdir(CERTIFICATE_FOLDER):
+                    certs.append(file_name)
+
+            certificate.load_certificate_from_folder(certs)
+            liste = CertificateService.get_certificate_list()
+            mine_certs = []
+            check2 = False
+            for cert in liste:
+                if str(cert.subject).split(sep="=")[1][:-2] == name:
+                    mine_certs.append(cert)
+            for my_cert in mine_certs:
+                if certificate.check_certificate_validity(my_cert): #in general need to check for all certificates
+                    check2 = True
+
+            # if at least one will be fine go with decryption
+            if check2:
+                try:
+                    key = get_key_from_header(f"{folder_path_var.get()}/header.json", private_key_path.get(), name, password)
+                    decrypt_folder(folder_path_var.get(), key, "g")
+                except:
+                    messagebox.showerror("Error", "Incorrect folder or key data")
+            else:
+                messagebox.showerror("Wrong user", "There is no valid certificate for this user")
+        else:
+            messagebox.showerror("Empty data", "Both user name and password should not be empty")
+
     # app window
     window = tk.Tk()
     window.title("Cryptographic app")
@@ -163,9 +224,17 @@ def main():
     cert_listbox = tk.Listbox(window, selectmode=tk.MULTIPLE, height=3)
     go_back_to_app_button = tk.Button(window, text="Go back", command=go_back_to_app)
     confirm_certs_button = tk.Button(window, text="Confirm", command=process_certs)
-    choose_folder_to_encrypt = tk.Button(window, text="Choose folder to encrypt", command=choose_folder)
-    encrypt_button = tk.Button(window, text="Encrypt", command=encrypt)
+    choose_folder_to_encrypt = tk.Button(window, text="Choose folder to encrypt", command=choose_folder_e)
+    encrypt_button2 = tk.Button(window, text="Encrypt", command=encrypt)
 
+    # widgets for decrypt
+    private_key_path = tk.StringVar()
+    check = tk.BooleanVar()
+    check.set(False)
+    choose_folder_to_decrypt = tk.Button(window, text="Choose folder to decrypt", command=choose_folder_d)
+    choose_private_key = tk.Button(window, text="Choose private key", command=choose_key)
+    go_back_to_app_button_from_decrypt = tk.Button(window, text="Go back", command=go_back_to_app)
+    decrypt_button2 = tk.Button(window, text="Decrypt", command=decrypt)
     show_main_menu()
     
     window.mainloop()

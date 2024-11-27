@@ -63,3 +63,4 @@ def decode(file, key):
         os.remove(file)
     except Exception as e:
         display_error(f"Error decrypting {file}: {e}")
+        raise Exception(f"{e}")
