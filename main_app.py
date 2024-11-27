@@ -1,3 +1,6 @@
+from crypto.admin import Admin
+from crypto.certificate_service import CertificateService
+
 from Crypto.Random import get_random_bytes
 from utils.file_utils import *
 from crypto.aes import *
@@ -28,8 +31,8 @@ def main():
         
         go_back_to_menu_button.pack(anchor=tk.W)
         issue_cert_button.place(x=350, y=0)
-        encrypt_button.place(x=125, y=100)
-        decrypt_button.place(x=275, y=100)
+        encrypt_button.place(x=115, y=100)
+        decrypt_button.place(x=265, y=100)
         
     def forget_app_menu():
         global issue_cert_button, encrypt_button, decrypt_button
@@ -61,8 +64,17 @@ def main():
         password = simpledialog.askstring("Enter password", "Please enter admin password:")
 
         if name == "authority" and password == "crypto":
-            # generate_rsa_keys(name, password)
-            messagebox.showinfo("Access granted", "Placeholder")
+            messagebox.showinfo("Access granted", "Access granted!")
+            admin = Admin()
+            certService = CertificateService(admin)
+            while True:
+                user_name = simpledialog.askstring("Enter user name", "Please enter user name:")
+                if user_name:
+                    break
+                else:
+                    messagebox.showerror("Empty name", "You entered empty user name")
+            certService.creating_and_signing_certificate(user_name)
+            messagebox.showinfo("Issued certificate", f"Certificate for {user_name} was successfully issued!")
         else:
             messagebox.showerror("Access denied", "Wrong name and/or password")
         

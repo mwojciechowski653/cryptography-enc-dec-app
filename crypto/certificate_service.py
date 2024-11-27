@@ -73,31 +73,32 @@ class CertificateService:
         file_path = os.path.join(CERTIFICATE_FOLDER, f"{name}_certificate.pem")                                 
         write_file(file_path, pem_certificate)                                                                  # writing certificate to the file
         
-    def load_certificate_from_folder(self):                                                                     # getting all certificates from the forlder certificates
+    def load_certificate_from_folder(self, choosen_certs):                                                                     # getting all certificates from the forlder certificates
         if os.path.isdir(CERTIFICATE_FOLDER):
             for file_name in os.listdir(CERTIFICATE_FOLDER):
-                file_path = os.path.join(CERTIFICATE_FOLDER, file_name)
-                
-                if file_name.endswith(".pem") or file_name.endswith(".crt"):
-                    try:
-                        certificate_file = read_file(file_path)
-               
+                if file_name in choosen_certs:
+                    file_path = os.path.join(CERTIFICATE_FOLDER, file_name)
+                    
+                    if file_name.endswith(".pem") or file_name.endswith(".crt"):
                         try:
-                            certificate = load_pem_x509_certificate(certificate_file)
-                            CertificateService.certificates_list.append(certificate)
-                            messagebox.showinfo("Uploading PEM certificate",f"Uploading certificate PEM: {file_name} went correctly")
-                            
-                        except ValueError:
+                            certificate_file = read_file(file_path)
+                   
                             try:
-                                certificate = load_der_x509_certificate(certificate_file)
+                                certificate = load_pem_x509_certificate(certificate_file)
                                 CertificateService.certificates_list.append(certificate)
-                                messagebox.showinfo("Uploading DER certificate",f"Uploading certificate DER: {file_name} went correctly")
+                                messagebox.showinfo("Uploading PEM certificate",f"Uploading certificate PEM: {file_name} went correctly")
                                 
                             except ValueError:
-                                messagebox.showerror("Uploading certificate error", f"Uploading certificate: {file_name} failed")
-                                
-                    except Exception:
-                        messagebox.showerror("Opening certificate error", f"Opening certificate {file_name} file failed")
+                                try:
+                                    certificate = load_der_x509_certificate(certificate_file)
+                                    CertificateService.certificates_list.append(certificate)
+                                    messagebox.showinfo("Uploading DER certificate",f"Uploading certificate DER: {file_name} went correctly")
+                                    
+                                except ValueError:
+                                    messagebox.showerror("Uploading certificate error", f"Uploading certificate: {file_name} failed")
+                                    
+                        except Exception:
+                            messagebox.showerror("Opening certificate error", f"Opening certificate {file_name} file failed")
         else:
             messagebox.showerror("No folder error", "Certificate folder doesn't exist")
             
