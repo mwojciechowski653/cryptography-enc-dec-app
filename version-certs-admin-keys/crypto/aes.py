@@ -1,8 +1,10 @@
-import os
 import json
-from utils.file_utils import *
+
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
+
+from utils.file_utils import *
+
 
 def encode(file, key):
     # Get the file extension

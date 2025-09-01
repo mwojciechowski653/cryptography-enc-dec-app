@@ -1,16 +1,10 @@
+import tkinter as tk
+
+from coding import *
+from constants import *
 from crypto.admin import Admin
 from crypto.certificate_service import CertificateService
-from constants import *
 from crypto.header import *
-
-
-from Crypto.Random import get_random_bytes
-from utils.file_utils import *
-from crypto.aes import *
-from crypto.rsa import *
-from coding import *
-import tkinter as tk
-from tkinter import ttk, messagebox, simpledialog
 
 users = []
 

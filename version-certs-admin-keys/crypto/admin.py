@@ -1,7 +1,4 @@
-import os
-from coding import *
-from constants import APP_PRIVATE_KEY_NAME, APP_AES_NAME, APP_PUBLIC_KEY_NAME, KEY_FOLDER, KEY_FOLDER_NAME, PROJECT_FOLDER, APP_PRIVATE_KEY_PATH, APP_AES_PATH
-from utils.file_utils import *
+from constants import APP_PRIVATE_KEY_NAME, APP_AES_NAME, APP_PUBLIC_KEY_NAME, KEY_FOLDER, PROJECT_FOLDER, APP_PRIVATE_KEY_PATH, APP_AES_PATH
 from crypto.aes import *
 from crypto.rsa import *
 

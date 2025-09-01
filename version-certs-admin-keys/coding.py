@@ -1,5 +1,4 @@
 import os
-from Crypto.Random import get_random_bytes
 from utils.file_utils import *
 from crypto.aes import *
 from crypto.rsa import *
