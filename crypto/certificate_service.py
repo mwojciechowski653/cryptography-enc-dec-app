@@ -73,7 +73,9 @@ class CertificateService:
         file_path = os.path.join(CERTIFICATE_FOLDER, f"{name}_certificate.pem")                                 
         write_file(file_path, pem_certificate)                                                                  # writing certificate to the file
         
-    def load_certificate_from_folder(self, choosen_certs):                                                                     # getting all certificates from the forlder certificates
+    def load_certificate_from_folder(self, choosen_certs): 
+        CertificateService.certificates_list = []
+        # getting all certificates from the forlder certificates
         if os.path.isdir(CERTIFICATE_FOLDER):
             for file_name in os.listdir(CERTIFICATE_FOLDER):
                 if file_name in choosen_certs:

@@ -123,11 +123,11 @@ def main():
         choosen_cerst = []
         for i in choosen:
             choosen_cerst.append(cert_listbox.get(i))
-        
         certificate = CertificateService()
         certificate.load_certificate_from_folder(choosen_cerst)
         liste = CertificateService.get_certificate_list()
 
+        users = []
         for cert in liste:
             if certificate.check_certificate_validity(cert):  # in general need to check for all certificates
                 users.append(cert)
@@ -202,6 +202,19 @@ def main():
         else:
             messagebox.showerror("Empty data", "Both user name and password should not be empty")
 
+    # check if keys for admin exists (should be initialized only on first run of app)
+    try:
+        aes = open("KeyFolder/app_aes.key.enc")
+        priv = open("KeyFolder/app_private.pem")
+        pub = open("KeyFolder/app_public.pem")
+        
+        aes.close()
+        priv.close()
+        pub.close()
+    except FileNotFoundError:
+        admin = Admin()
+        admin.create_all_admin_keys()
+    
     # app window
     window = tk.Tk()
     window.title("Cryptographic app")
